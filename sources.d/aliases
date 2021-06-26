@@ -15,3 +15,4 @@ alias b="back"
 alias n="next"
 
 alias rsync="rsync -r --progress"
+alias wl-copy="wl-copy --foreground --paste-once --trim-newline"
