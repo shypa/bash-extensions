@@ -31,3 +31,6 @@ for file in "${XDG_DATA_HOME:-"$HOME"/.local/share}"/bash/completions.d/*; do
 done
 shopt -u nullglob
 unset file
+
+export HISTCONTROL=ignoreboth
+export HISTSIZE=1000
