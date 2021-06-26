@@ -19,7 +19,8 @@ cd()
 {
     case "$1" in
     history)
-        tr '\0' '\n' < "${CD[LOGDIR]}/${CD[LOGFILE]}" | cat -n
+        tr '\0' '\n' < "${CD[LOGDIR]}/${CD[LOGFILE]}" | cat -vn |
+            sed "${CD[LOGLINE]}s/$/ */"
         return
         ;;
     clean)
