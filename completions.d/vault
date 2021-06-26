@@ -4,12 +4,12 @@
 #
 # author: ypsah <asyph@tutanota.com>
 
-_vault_delete()
+_vault_remove()
 {
     _filedir
 }
 
-_vault_put()
+_vault_stash()
 {
     _filedir
 }
@@ -30,7 +30,7 @@ _vault()
         return
     fi
 
-    local -a actions=(create put delete)
+    local -a actions=(create seal stash remove)
     COMPREPLY=($(compgen -W '${actions[*]}' -- "$cur"))
 }
 
