@@ -9,7 +9,8 @@ bashrc_DATA = .bashrc
 
 extensionsdir = $(XDG_DATA_HOME)/bash/sources.d
 extensions_DATA = sources.d/aliases sources.d/cd sources.d/colors \
-				  sources.d/git sources.d/paths sources.d/pipe sources.d/ps1
+				  sources.d/exit sources.d/git sources.d/paths sources.d/pipe \
+				  sources.d/ps1
 
 ps1dir = $(XDG_DATA_HOME)/bash/ps1.d
 ps1_DATA = ps1.d/background_jobs ps1.d/classic ps1.d/git_branch \
