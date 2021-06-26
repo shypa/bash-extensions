@@ -10,6 +10,8 @@ alias grep="grep --color=auto"
 # User specific aliases and functions
 alias chmods="chmod u+x"
 
+alias diff="diff --color=auto --unified"
+
 alias b="back"
 alias n="next"
 
