@@ -7,8 +7,6 @@ alias lh="ls -lh"
 alias grep="grep --color=auto"
 
 # User specific aliases and functions
-alias clr="clear"
-alias la="ls -a"
 alias chmods="chmod u+x"
 
 alias b="back"
