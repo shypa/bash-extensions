@@ -25,9 +25,15 @@ _cd()
         return
         ;;
     "")
-        COMPREPLY=($(compgen -W 'history clean' -- "$cur"))
+        _filedir -d
+        if [[ -z $cur && ${#COMPREPLY[@]} -gt 0 ]]; then
+            local reply letter="${COMPREPLY[0]:0:1}"
+            for reply in "${COMPREPLY[@]:1}"; do
+                [[ ${reply:0:1} != "$letter" ]] && break 2
+            done
+            return
+        fi
+        COMPREPLY+=($(compgen -W 'clean history' -- "$cur"))
         ;;
     esac
-
-    _filedir -d
 } && complete -F _cd cd
