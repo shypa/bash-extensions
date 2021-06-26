@@ -8,22 +8,18 @@ _ps1_git_dirtyness()
 {
     _is_git || return
 
-    local -i staged_count=0 unstaged_count=0 untracked_count=0
+    local -i staged=0 unstaged=0 untracked=0
+    local status
 
-    while IFS='' read -r file_status; do
-        if [ "${file_status:0:2}" = "??" ]; then
-            untracked_count+=1
-            continue
-        elif [ "${file_status:1:1}" != " " ]; then
-            unstaged_count+=1
-        elif [ "${file_status:0:1}" != " " ]; then
-            staged_count+=1
-        fi
+    while IFS='' read -r status; do
+        [[ ${status:0:2} == \?\? ]] && { untracked+=1; continue; }
+        [[ ${status:0:1} != " " ]] && staged+=1
+        [[ ${status:1:1} != " " ]] && unstaged+=1
     done < <(git status --porcelain)
 
-    [[ $staged_count -eq 0 ]] && [[ $unstaged_count -eq 0 ]] && return
+    [[ $staged -eq 0 ]] && [[ $unstaged -eq 0 ]] && return
 
-    PS1+="[$(green --escape)${staged_count}$(default --escape)|"
-    PS1+="$(red --escape)${unstaged_count}$(default --escape)|"
-    PS1+="$(orange --escape)${untracked_count}$(default --escape)]"
+    PS1+="[$(green --escape)${staged}$(default --escape)|"
+    PS1+="$(red --escape)${unstaged}$(default --escape)|"
+    PS1+="$(orange --escape)${untracked}$(default --escape)]"
 }
