@@ -17,7 +17,7 @@ _ps1()
     PS1="$(
         _ps1_classic
         _ps1_return_code $exit_code
-        _ps1_background_jobs /proc/"$$"/fd/$_ps1_pipe
+        _ps1_background_jobs /dev/fd/$_ps1_pipe
         _ps1_git_branch
         _ps1_git_dirtyness
     )\$ "
