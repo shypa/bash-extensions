@@ -7,7 +7,7 @@
 exit()
 {
     local -i code=${1:-$?}
-    shift
+    shift || true
 
     exec 2>&1
 
