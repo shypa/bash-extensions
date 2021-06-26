@@ -1,0 +1,18 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_ps1_classic()
+{
+    # Colors
+    local -a colors_=(default pink green yellow blue red purple)
+    local color="${colors_[SHLVL % ${#colors_[@]}]}"
+
+    # Basic look: [username current_directory]
+    PS1+="[$(eval "$color --escape")\u$(default --escape) \W]"
+
+    # Update the terminal's title bar
+    printf '\e]0;%s@%s:%s\007' "$USER" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"
+}

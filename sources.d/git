@@ -1,0 +1,100 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+# Is the current directory under a git repository?
+#
+# Sets `git_dir' to the root directory of the git repository on success
+_git_dir()
+{
+    git_dir="$PWD"
+
+    while [[ $git_dir ]]; do
+        [ -d "$git_dir"/.git ] && return 0
+        git_dir="${git_dir%/*}"
+    done
+    return 1
+}
+
+_git_freshness()
+{
+    local commit
+    local behind=false ahead=false
+
+    while IFS='' read -r commit; do
+        [[ "${commit:0:1}" == '<' ]] && behind=true || ahead=true
+        $ahead  && $behind && break
+    done < <(git rev-list --left-right @{upstream}...HEAD 2>/dev/null)
+
+    $ahead && git_freshness='>'
+    $behind && git_freshness+='<'
+}
+
+_git_ongoing_operations()
+{
+    [[ -d "$git_dir"/.git/rebase-merge || -f "$git_dir"/.git/rebase-apply ]] &&
+        git_operations+=(rebase)
+    [[ -f "$git_dir"/.git/MERGE_HEAD ]] && git_operations+=(merge)
+    [[ -f "$git_dir"/.git/CHERRY_PICK_HEAD ]] && git_operations+=(cherry-pick)
+    [[ -f "$git_dir"/.git/REVERT_HEAD ]] && git_operations+=(revert)
+    [[ -f "${git_dir}/.git/BISECT_LOG" ]] && git_operations+=(bisect)
+    return 0
+}
+
+_git_current_branch()
+{
+    local freshness=false
+    local colorize=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        -f|--freshness)
+            freshness=true
+            ;;
+        -c|--colorize)
+            colorize=true
+            ;;
+        esac
+        shift
+    done
+
+    read -r git_branch < "$git_dir"/.git/HEAD
+
+    if [[ ${git_branch:0:3} == ref ]]; then
+        # XXX: this will not work properly if a branch's names contains '/'
+        git_branch="${git_branch##*/}"
+    else
+        git_branch="${git_branch:0:8}"
+    fi
+
+    local git_freshness
+    $freshness && _git_freshness
+
+    $colorize || { git_branch+="$git_freshness"; return 0; }
+
+    # Are there special operations going on?
+    local -a git_operations
+    _git_ongoing_operations
+
+    local operation
+    local -a colors_
+    for operation in "${git_operations[@]}"; do
+        case "$operation" in
+        rebase)
+            colors_+=(orange)
+            ;;
+        merge|cherry-pick|revert)
+            colors_+=(red)
+            ;;
+        bisect)
+            colors_+=(blue)
+            ;;
+        esac
+    done
+
+    local string="$git_branch"
+    colorize "${colors_[@]}"
+    git_branch="${string}$git_freshness"
+}

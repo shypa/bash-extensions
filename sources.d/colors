@@ -1,0 +1,68 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+declare -Ax colors=(
+    [default]=39
+
+    [red]=31
+    [green]=32
+    [yellow]=33
+    [blue]=34
+    [magenta]=35
+    [cyan]=36
+    [gray]=37
+
+    [purple]="38;5;99"
+    [pink]="38;5;205"
+    [orange]="38;5;208"
+)
+
+_color()
+{
+    local escape=false
+    local -i bold=0
+
+    while [[ $# -gt 0 ]]; do
+        [[ $1 =~ ^-[^-]. ]] && set -- "${1:0:2}" "-${1:2}" "${@:2}" 
+        case "$1" in
+        -e|--escape)
+            escape=true
+            ;;
+        -b|--bold)
+            bold=1
+            ;;
+        *)
+            break
+            ;;
+        esac
+        shift
+    done
+
+    $escape && printf '\['
+    printf '\e[%i;%sm' "$bold" "$1"
+    $escape && printf '\]'
+
+    return 0
+}
+
+for _ in "${!colors[@]}"; do
+    eval "$_() { _color "'"$@"'" \"${colors[$_]}\"; }"
+done
+
+colorize()
+{
+    [[ $# == 0 ]] && return
+    local tmp="$string"
+    string=""
+
+    local -i i=0
+    while [[ $tmp ]]; do
+        string+="$("${!i}" -e)${tmp:0:1}"
+        tmp="${tmp:1}"
+        ((++i == $#)) && i=0
+        echo "$tmp"
+    done
+}

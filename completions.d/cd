@@ -1,0 +1,32 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_cd()
+{
+    local cur prev words cword
+    _init_completion
+
+    local arg
+    _get_first_arg
+
+    case "$arg" in
+    history)
+        return
+        ;;
+    clean)
+        [[ $prev == "clean" ]] || return
+        COMPREPLY=($(compgen -W 'all old' -- "$cur"))
+        return
+        ;;
+    "")
+        COMPREPLY=($(compgen -W 'history clean' -- "$cur"))
+        ;;
+    esac
+
+    _filedir -d
+}
+
+complete -F _cd cd

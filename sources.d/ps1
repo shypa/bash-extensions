@@ -1,0 +1,23 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_ps1()
+{
+    local -i exit_code=$?
+
+    # Lower left corner part
+    PS1=""
+    _ps1_classic
+    _ps1_return_code $exit_code
+    _ps1_background_jobs
+    _ps1_git_branch
+    _ps1_git_dirtyness
+    PS1+="\$ "
+
+    return $exit_code
+}
+
+export PROMPT_COMMAND="_ps1"

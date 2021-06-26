@@ -1,0 +1,17 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_ps1_git_branch()
+{
+    local git_dir
+    _git_dir || return 0
+
+    # What is the current branch name?
+    local git_branch
+    _git_current_branch --freshness --colorize
+
+    PS1+="[${git_branch}]"
+}

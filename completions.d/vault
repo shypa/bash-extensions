@@ -1,0 +1,37 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_vault_delete()
+{
+    _filedir
+}
+
+_vault_put()
+{
+    _filedir
+}
+
+_vault()
+{
+    local cur prev words cword
+    _init_completion
+
+    local arg
+    _get_first_arg
+
+    if [[ $arg ]]; then
+        local func
+
+        printf -v func '_vault_%s' "$arg"
+        declare -F "$func" >/dev/null && "$func"
+        return
+    fi
+
+    local -a actions=(create put delete)
+    COMPREPLY=($(compgen -W '${actions[*]}' -- "$cur"))
+}
+
+complete -F _vault vault

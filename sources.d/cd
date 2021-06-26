@@ -1,0 +1,107 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+# Wrapper around cd
+
+declare -Ax CD=(
+    [LOGLINE]=1
+    [LOGDIR]="${XDG_CACHE_HOME:-"$HOME"/.cache}"/cd
+    [LOGFILE]="$(uuidgen -t).log"
+    )
+
+mkdir -p "${CD[LOGDIR]}"
+printf '%s\0' "$PWD" > "${CD[LOGDIR]}/${CD[LOGFILE]}"
+
+cd()
+{
+    case "$1" in
+    history)
+        tr '\0' '\n' < "${CD[LOGDIR]}/${CD[LOGFILE]}" | cat -n
+        return
+        ;;
+    clean)
+        [[ -d ${CD[LOGDIR]} ]] || return
+        shift
+
+        case "$1" in
+        all)
+            find "${CD[LOGDIR]}" -name '*.log' -delete
+            ;;
+        old)
+            find "${CD[LOGDIR]}" -name '*.log' -atime 30 -delete
+            ;;
+        "")
+            find "${CD[LOGDIR]}" -name '*.log' \
+                ! -path "${CD[LOGDIR]}/${CD[LOGFILE]}" -delete
+            ;;
+        *)
+            printf '%s: "%s": unknown cleaning target, choose one among {"all, "old", ""}\n' \
+                "${FUNCNAME[0]}" "$1" >&2
+            return 64
+            ;;
+        esac
+        return
+        ;;
+    *)
+        builtin cd "$@" || return
+
+        ((CD[LOGLINE]++))
+        sed -zi "${CD[LOGLINE]}~1 d" "${CD[LOGDIR]}/${CD[LOGFILE]}"
+        printf '%s\0' "$PWD" >> "${CD[LOGDIR]}/${CD[LOGFILE]}"
+        ;;
+    esac
+}
+
+fetch_line()
+{
+    local null=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        -z?*)
+            set -- "-${1:1}" "${@:2}"
+            ;&
+        -z|--null)
+            null=true
+            ;;
+        *)
+            break
+            ;;
+        esac
+        shift
+    done
+
+    if $null; then
+        sed -z "$1q;d" "$2" | tr -d '\0'
+    else
+        sed "$1q;d" "$2"
+    fi
+}
+
+back()
+{
+    local -i hops="${1:-1}"
+
+    ((CD[LOGLINE]-=hops))
+    [[ ${CD[LOGLINE]} -ge 1 ]] || CD[LOGLINE]=1
+
+    builtin cd "$(fetch_line -z ${CD[LOGLINE]} "${CD[LOGDIR]}/${CD[LOGFILE]}")"
+}
+
+next()
+{
+    local -i hops="${1:-1}"
+    local -i logline_max="$(grep -c $'\0' "${CD[LOGDIR]}/${CD[LOGFILE]}")"
+
+    ((CD[LOGLINE]+=hops))
+    [[ ${CD[LOGLINE]} -le $logline_max ]] ||
+        CD[LOGLINE]=$logline_max
+
+    builtin cd "$(fetch_line -z ${CD[LOGLINE]} "${CD[LOGDIR]}/${CD[LOGFILE]}")"
+}
+
+# Let's prevent files from accumulating indefinitely
+[[ -d ${CD[LOGDIR]} ]] && cd clean old

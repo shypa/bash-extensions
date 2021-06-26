@@ -1,0 +1,22 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+__ps1_background_jobs_tmpfile="$(mktemp -p "" background_jobs.XXXXXXXXX)"
+trap -- 'rm -f $__ps1_background_jobs_tmpfile' EXIT
+
+_ps1_background_jobs()
+{
+    jobs -pr > "$__ps1_background_jobs_tmpfile"
+    readarray -t jobs_running < "$__ps1_background_jobs_tmpfile"
+    jobs -ps > "$__ps1_background_jobs_tmpfile"
+    readarray -t jobs_stopped < "$__ps1_background_jobs_tmpfile"
+
+    if ((${#jobs_running[@]} + ${#jobs_stopped[@]})); then
+        printf -v PS1 '%s[%s%i%s/%s%i%s]' "$PS1" \
+            "$(purple -be)" "${#jobs_running[@]}" "$(default -e)" \
+            "$(pink -be)" "${#jobs_stopped[@]}" "$(default -e)"
+    fi
+}

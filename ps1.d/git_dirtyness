@@ -1,0 +1,29 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_ps1_git_dirtyness()
+{
+    _is_git || return
+
+    local -i staged_count=0 unstaged_count=0 untracked_count=0
+
+    while IFS='' read -r file_status; do
+        if [ "${file_status:0:2}" = "??" ]; then
+            untracked_count+=1
+            continue
+        elif [ "${file_status:1:1}" != " " ]; then
+            unstaged_count+=1
+        elif [ "${file_status:0:1}" != " " ]; then
+            staged_count+=1
+        fi
+    done < <(git status --porcelain)
+
+    [[ $staged_count -eq 0 ]] && [[ $unstaged_count -eq 0 ]] && return
+
+    PS1+="[$(green --escape)${staged_count}$(default --escape)|"
+    PS1+="$(red --escape)${unstaged_count}$(default --escape)|"
+    PS1+="$(orange --escape)${untracked_count}$(default --escape)]"
+}
