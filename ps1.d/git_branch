@@ -13,5 +13,5 @@ _ps1_git_branch()
     local git_branch
     _git_current_branch --freshness --colorize
 
-    PS1+="[${git_branch}]"
+    printf '[%s]' "$git_branch"
 }

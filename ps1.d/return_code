@@ -6,7 +6,13 @@
 
 _ps1_return_code()
 {
-    PS1+="["
-    [[ $1 -eq 0 ]] && PS1+="$(green -e)" || PS1+="$(orange -be)"
-    PS1+="\$?$(default -e)]"
+    printf '['
+    if (($1 == 0)); then
+        green --escape
+    else
+        orange --bold --escape
+    fi
+    printf '$?'
+    default --escape
+    printf ']'
 }

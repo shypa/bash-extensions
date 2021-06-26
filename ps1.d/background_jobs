@@ -17,8 +17,10 @@ _ps1_background_jobs()
     readarray -t stopped < "$__ps1_background_jobs_tmpfile"
 
     if ((${#running[@]} + ${#stopped[@]})); then
-        printf -v PS1 '%s[%s%i%s/%s%i%s]' "$PS1" \
-            "$(purple -be)" "${#running[@]}" "$(default -e)" \
-            "$(pink -be)" "${#stopped[@]}" "$(default -e)"
+        print '['
+        purple -be; printf '%i' "${#running[@]}"; default --escape
+        print '/'
+        pink -be; printf '%i' "${#stopped[@]}"; default --escape
+        print ']'
     fi
 }

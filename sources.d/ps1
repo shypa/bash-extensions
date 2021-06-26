@@ -9,15 +9,16 @@ _ps1()
     local -i exit_code=$?
 
     # Lower left corner part
-    PS1=""
-    _ps1_classic
-    _ps1_return_code $exit_code
-    _ps1_background_jobs
-    _ps1_git_branch
-    _ps1_git_dirtyness
-    PS1+="\$ "
+    PS1="$(
+        _ps1_classic
+        _ps1_return_code $exit_code
+        _ps1_background_jobs
+        _ps1_git_branch
+        _ps1_git_dirtyness
+    )\$ "
 
-    return $exit_code
+    # Update the terminal's title bar
+    printf '\e]0;%s@%s:%s\007' "$USER" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"
 }
 
 export PROMPT_COMMAND="_ps1"
