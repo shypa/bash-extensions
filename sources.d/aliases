@@ -13,3 +13,5 @@ alias chmods="chmod u+x"
 
 alias b="back"
 alias n="next"
+
+alias rsync="rsync -r --progress"
