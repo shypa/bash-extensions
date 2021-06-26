@@ -7,7 +7,10 @@
 _cd()
 {
     local cur prev words cword
-    _init_completion
+    _init_completion &>/dev/null || {
+        complete -o dirnames cd
+        return
+    }
 
     local arg
     _get_first_arg
@@ -27,6 +30,4 @@ _cd()
     esac
 
     _filedir -d
-}
-
-complete -F _cd cd
+} && complete -F _cd cd
