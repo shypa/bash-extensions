@@ -6,7 +6,8 @@
 
 _ps1_git_dirtyness()
 {
-    _is_git || return
+    local git_dir
+    _git_dir || return 0
 
     local -i staged=0 unstaged=0 untracked=0
     local status
