@@ -1,0 +1,14 @@
+#! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+_pipe()
+{
+    local tmpdir="$(mktemp --tmpdir -d)"
+
+    mkfifo "$tmpdir"/pipe
+    eval exec "$1<>'$tmpdir'"/pipe
+    rm -rf "$tmpdir"
+}

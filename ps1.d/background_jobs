@@ -4,23 +4,31 @@
 #
 # author: ypsah <asyph@tutanota.com>
 
-__ps1_background_jobs_tmpfile="$(mktemp -p "" background_jobs.XXXXXXXXX)"
-trap -- 'rm -f $__ps1_background_jobs_tmpfile' EXIT
 
 _ps1_background_jobs()
 {
-    local running stopped
+    local -i running stopped
 
-    jobs -pr > "$__ps1_background_jobs_tmpfile"
-    readarray -t running < "$__ps1_background_jobs_tmpfile"
-    jobs -ps > "$__ps1_background_jobs_tmpfile"
-    readarray -t stopped < "$__ps1_background_jobs_tmpfile"
+    exec 3<>"$1"
 
-    if ((${#running[@]} + ${#stopped[@]})); then
-        print '['
-        purple -be; printf '%i' "${#running[@]}"; default --escape
-        print '/'
-        pink -be; printf '%i' "${#stopped[@]}"; default --escape
-        print ']'
+    jobs -pr >&3
+    while read -t 0 -u 3; do
+        read -ru 3
+        running+=1
+    done
+    jobs -ps >&3
+    while read -t 0 -u 3; do
+        read -ru 3
+        stopped+=1
+    done
+
+    if ((running + stopped)); then
+        printf '['
+        purple --bold --escape; printf '%i' "$running"; default --escape
+        printf '/'
+        pink --bold --escape; printf '%i' "$stopped"; default --escape
+        printf ']'
     fi
+
+    exec 3>&- 3<&-
 }

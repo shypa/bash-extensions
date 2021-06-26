@@ -4,6 +4,10 @@
 #
 # author: ypsah <asyph@tutanota.com>
 
+# XXX: this will work because "pipe" < "ps1", but it is fragile
+#      (files have to be sourced in order)
+_pipe 3
+
 _ps1()
 {
     local -i exit_code=$?
@@ -12,7 +16,7 @@ _ps1()
     PS1="$(
         _ps1_classic
         _ps1_return_code $exit_code
-        _ps1_background_jobs
+        _ps1_background_jobs /proc/"$$"/fd/3
         _ps1_git_branch
         _ps1_git_dirtyness
     )\$ "
