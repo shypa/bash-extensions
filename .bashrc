@@ -32,5 +32,6 @@ done
 shopt -u nullglob
 unset file
 
+export PASSWORD_STORE_CLIP_TIME=7
 export HISTCONTROL=ignoreboth
 export HISTSIZE=1000
