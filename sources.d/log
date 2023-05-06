@@ -1,0 +1,115 @@
+#! /usr/bin/env bash
+#
+# SPDX-License-Identifier: MIT
+#
+# author: ypsah <asyph@tutanota.com>
+
+################################################################################
+#                                CONFIGURATION                                 #
+################################################################################
+
+LOG_LEVEL=${LOG_LEVEL:-WARNING}
+# The following placeholders are currently supported in LOG_PREFIX:
+#   - %datetime: the time at the moment the log entry is emitted;
+#   - %level: the logging level at which the log entry is emitted;
+#   - %short-level: like %level, but only the first letter.
+LOG_PREFIX=${LOG_PREFIX:-"[%datetime][%short-level] "}
+LOG_DATETIME_FORMAT=${LOG_DATETIME_FORMAT:-"%FT%T%z"}  # strftime(3)
+LOG_OUTPUT=${LOG_OUTPUT:-/dev/stderr}
+
+export LOG_LEVEL LOG_PREFIX LOG_DATETIME_FORMAT LOG_OUTPUT
+
+################################################################################
+#                                   LOGGING                                    #
+################################################################################
+
+# Associative arrays cannot be reliably exported, eval the following function
+# to have them defined
+log.levels()
+{
+    printf 'declare -A LOG_LEVELS
+
+    [[ ${#LOG_LEVELS[@]} -eq 0 ]] && LOG_LEVELS=(
+        [DEBUG]=10
+        [INFO]=20
+        [WARNING]=30
+        [ERROR]=40
+        [CRITICAL]=50
+    )'
+}
+
+export -f log.levels
+
+log._log()
+{
+    eval "$(log.levels)"
+
+    local level=$1
+    shift
+
+    [[ -v LOG_LEVELS[$LOG_LEVEL] ]] || return
+    [[ -v LOG_LEVELS[$level] ]] || return
+
+    [[ ${LOG_LEVELS[$level]} -lt ${LOG_LEVELS[$LOG_LEVEL]} ]] && return
+
+    local datetime_format datetime
+    printf -v datetime_format '%%(%s)T' "$LOG_DATETIME_FORMAT"
+    printf -v datetime "$datetime_format"
+
+    local prefix=$LOG_PREFIX
+    prefix="${prefix//%level/$level}"
+    prefix="${prefix//%short-level/${level:0:1}}"
+    prefix="${prefix//%datetime/$datetime}"
+
+    (
+    exec > "$LOG_OUTPUT"
+    printf "$prefix"
+    printf "$@"
+    printf '\n'
+    )
+}
+
+export -f log._log
+
+eval "$(log.levels)"
+for _ in "${!LOG_LEVELS[@]}"; do
+    eval "log.${_,,}() { log._log "$_" "'"$@"'"; }; export -f log.${_,,}"
+done
+
+log.verbose()
+{
+    eval "$(log.levels)"
+
+    [[ -v LOG_LEVELS[$LOG_LEVEL] ]] || return
+
+    local level pick
+    for level in "${!LOG_LEVELS[@]}"; do
+        [[ ${LOG_LEVELS[$level]} -ge ${LOG_LEVELS[$LOG_LEVEL]} ]] && continue
+        [[ ${LOG_LEVELS[$level]} -lt ${LOG_LEVELS[${pick:-$level}]} ]] &&
+            continue
+        pick=$level
+    done
+
+    LOG_LEVEL=${pick:-$LOG_LEVEL}
+}
+
+export -f log.verbose
+
+log.quiet()
+{
+    eval "$(log.levels)"
+
+    [[ -v LOG_LEVELS[$LOG_LEVEL] ]] || return
+
+    local level pick
+    for level in "${!LOG_LEVELS[@]}"; do
+        [[ ${LOG_LEVELS[$level]} -le ${LOG_LEVELS[$LOG_LEVEL]} ]] && continue
+        [[ ${LOG_LEVELS[$level]} -gt ${LOG_LEVELS[${pick:-$level}]} ]] &&
+            continue
+        pick=$level
+    done
+
+    LOG_LEVEL=${pick:-$LOG_LEVEL}
+}
+
+export -f log.quiet
