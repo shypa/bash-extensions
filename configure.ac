@@ -1,6 +1,4 @@
 # SPDX-License-Identifier: MIT
-#
-# author: ypsah <asyph@tutanota.com>
 
 AC_INIT([bash-extensions], [0.1], [asyph@tutanota.com])
 AC_CONFIG_SRCDIR([.bashrc])

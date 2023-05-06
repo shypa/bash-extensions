@@ -1,8 +1,6 @@
 #! /bin/bash
 #
 # SPDX-License-Identifier: MIT
-#
-# author: ypsah <asyph@tutanota.com>
 
 # XXX: this will work because "pipe" < "ps1", but it is fragile
 #      (files have to be sourced in order)

@@ -1,7 +1,5 @@
 .. SPDX-License-Identifier: MIT
 
-   author: ypsah <asyph@tutanota.com>
-
 ###############
 bash-extensions
 ###############

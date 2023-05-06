@@ -1,8 +1,6 @@
 #! /bin/bash
 #
 # SPDX-License-Identifier: MIT
-#
-# author: ypsah <asyph@tutanota.com>
 
 declare -Ax colors=(
     [default]=39
