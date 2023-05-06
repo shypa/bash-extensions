@@ -18,7 +18,7 @@ declare -Ax colors=(
     [orange]="38;5;208"
 )
 
-_color()
+colors._color()
 {
     local escape=false
     local -i bold=0
@@ -46,13 +46,13 @@ _color()
     return 0
 }
 
-export -f _color
+export -f colors._color
 
-for _ in "${!colors[@]}"; do
-    eval "$_() { _color "'"$@"'" \"${colors[$_]}\"; }; export -f $_"
+for color in "${!colors[@]}"; do
+    eval "colors.$color() { colors._color "'"$@"'" \"${colors[$color]}\"; }; export -f colors.$color"
 done
 
-colorize()
+colors.colorize()
 {
     local -a options
     [[ -v escape ]] && $escape && options+=(--escape)
@@ -79,4 +79,4 @@ colorize()
     string+="$(default "${options[@]}")"
 }
 
-export -f colorize
+export -f colors.colorize

@@ -6,11 +6,11 @@ _ps1_return_code()
 {
     printf '['
     if (($1 == 0)); then
-        green --escape
+        colors.green --escape
     else
-        orange --bold --escape
+        colors.orange --bold --escape
     fi
     printf '$?'
-    default --escape
+    colors.default --escape
     printf ']'
 }

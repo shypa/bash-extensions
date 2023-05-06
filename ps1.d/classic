@@ -5,9 +5,9 @@
 _ps1_classic()
 {
     # Colors
-    local -a colors_=(default pink green yellow blue red purple)
+    local -a colors_=("${!colors[@]}")
     local color="${colors_[SHLVL % ${#colors_[@]}]}"
 
     # Basic look: [username current_directory]
-    printf '['; "$color" --escape; printf '\\u'; default --escape; printf ' \W]'
+    printf '['; colors."$color" --escape; printf '\\u'; colors.default --escape; printf ' \W]'
 }

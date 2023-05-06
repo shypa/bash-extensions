@@ -22,9 +22,9 @@ _ps1_background_jobs()
 
     if ((running + stopped)); then
         printf '['
-        purple --bold --escape; printf '%i' "$running"; default --escape
+        colors.purple --bold --escape; printf '%i' "$running"; colors.default --escape
         printf '/'
-        pink --bold --escape; printf '%i' "$stopped"; default --escape
+        colors.pink --bold --escape; printf '%i' "$stopped"; colors.default --escape
         printf ']'
     fi
 

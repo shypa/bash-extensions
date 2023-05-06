@@ -19,10 +19,10 @@ _ps1_git_dirtyness()
     [[ $staged -eq 0 ]] && [[ $unstaged -eq 0 ]] && return
 
     printf '['
-    green --escape; printf '%d' "$staged"; default --escape
+    colors.green --escape; printf '%d' "$staged"; colors.default --escape
     printf '|'
-    red --escape; printf '%d' "$unstaged"; default --escape
+    colors.red --escape; printf '%d' "$unstaged"; colors.default --escape
     printf '|'
-    orange --escape; printf '%d' "$untracked"; default --escape
+    colors.orange --escape; printf '%d' "$untracked"; colors.default --escape
     printf ']'
 }

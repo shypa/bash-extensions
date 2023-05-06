@@ -93,6 +93,6 @@ _git_current_branch()
     done
 
     local string="$git_branch"
-    escape=true colorize "${colors_[@]}"
+    escape=true colors.colorize "${colors_[@]}"
     git_branch="${string}$git_freshness"
 }
