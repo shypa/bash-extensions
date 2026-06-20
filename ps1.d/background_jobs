@@ -5,7 +5,7 @@
 
 _ps1_background_jobs()
 {
-    local -i running stopped
+    local -i running=0 stopped=0
 
     exec 3<>"$1"
 
